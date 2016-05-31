@@ -28,6 +28,7 @@ export default class {
   }){
     this.file = file;
     this.cluster = opts.cluster;
+    this.options = opts.options; //plugin options
     this.extConf = opts.extConf;
     this.plugin = getPluginClass(plugin);
     this.config = opts.config;
@@ -89,7 +90,7 @@ export default class {
         });
       }
       let content = await this.pluginInstance.getContent('utf8');
-      this.cacheKey = md5(this.plugin.toString() + content);
+      this.cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
       let value = await this.cache.get(this.cacheKey);
       if(value){
         return value;
