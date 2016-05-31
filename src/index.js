@@ -11,6 +11,10 @@ const getPluginClass = fn => {
   }
   return fn;
 };
+/**
+ * empty fn
+ */
+const noop = () => {};
 
 /**
  * invoke plugin
@@ -24,6 +28,7 @@ export default class {
     options: {},
     cluster: null,
     fileManage: null,
+    logger: null,
     extConf: {}
   }){
     this.file = file;
@@ -35,6 +40,7 @@ export default class {
     this.pluginInstance = new this.plugin(this.file, opts);
     this.cache = null;
     this.cacheKey = '';
+    this.logger = opts.logger || noop;
   }
   /**
    * use cluster in master
@@ -120,11 +126,17 @@ export default class {
    * run
    */
   async run(){
+    let ret;
+    let startTime = Date.now();
     if(isMaster){
-      let ret = await this.invokeInMaster();
-      return this.pluginInstance.update(ret);
+      ret = await this.invokeInMaster();
+      ret = await this.pluginInstance.update(ret);
+    }else{
+      ret = await this.invokePluginRun();
     }
-    return this.invokePluginRun();
+    let endTime = Date.now();
+    this.logger(`${this.plugin.name}: file=${this.file.path}, time=${endTime - startTime}ms`);
+    return ret;
   }
   /**
    * run all files
