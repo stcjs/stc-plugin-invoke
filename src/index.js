@@ -56,6 +56,9 @@ export default class {
    * use cache in master
    */
   useCache(){
+    if(this.config.common.cache === false){
+      return false;
+    }
     let cache = this.plugin.cache;
     if(isFunction(cache)){
       return cache();
