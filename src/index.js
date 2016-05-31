@@ -108,7 +108,7 @@ export default class {
       ret = await this.invokePluginRun();
     }
     //set cache
-    if(useCache){
+    if(useCache && ret){
       await this.cache.set(this.cacheKey, ret);
     }
     return ret;
