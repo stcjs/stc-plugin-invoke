@@ -161,4 +161,10 @@ export default class {
       return pluginInstance.after(files);
     }
   }
+  /**
+   * get plugin class
+   */
+  static getPluginClass(plugin){
+    return getPluginClass(plugin);
+  }
 }
