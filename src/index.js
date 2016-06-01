@@ -95,7 +95,7 @@ export default class {
     if(useCache){
       if(!this.cache){
         this.cache = new StcCache({
-          type: this.plugin.name
+          type: (this.config.common.product || 'default') + '/' + this.plugin.name
         });
       }
       let content = await this.pluginInstance.getContent('utf8');
