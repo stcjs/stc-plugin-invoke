@@ -34,7 +34,7 @@ export default class {
     this.file = file;
     this.cluster = opts.cluster;
     this.options = opts.options; //plugin options
-    this.extConf = opts.extConf;
+    this.extConf = opts.extConf || {};
     this.plugin = getPluginClass(plugin);
     this.config = opts.config;
     this.pluginInstance = new this.plugin(this.file, opts);
@@ -128,7 +128,7 @@ export default class {
   async run(){
     let ret;
     let startTime = Date.now();
-    if(isMaster){
+    if(isMaster && !this.extConf.forceInMaster){
       ret = await this.invokeInMaster();
       ret = await this.pluginInstance.update(ret);
     }else{
