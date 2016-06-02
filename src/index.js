@@ -1,4 +1,3 @@
-import StcCache from 'stc-cache';
 import {isMaster} from 'cluster';
 import {isFunction, md5} from 'stc-helper';
 
@@ -24,22 +23,18 @@ export default class {
    * constructor
    */
   constructor(plugin, file, opts = {
-    config: {},
+    stc: null,
     options: {},
-    cluster: null,
-    fileManage: null,
     logger: null,
-    extConf: {}
+    ext: {}
   }){
     this.file = file;
-    this.cluster = opts.cluster;
+    this.stc = opts.stc;
     this.options = opts.options; //plugin options
-    this.extConf = opts.extConf || {};
+    this.ext = opts.ext || {};
     this.plugin = getPluginClass(plugin);
-    this.config = opts.config;
     this.pluginInstance = new this.plugin(this.file, opts);
     this.cache = null;
-    this.cacheKey = '';
     this.logger = opts.logger || noop;
   }
   /**
@@ -49,7 +44,7 @@ export default class {
     if(!isMaster){
       return false;
     }
-    if(this.config.common.cluster === false){
+    if(this.stc.config.common.cluster === false){
       return false;
     }
     let cluster = this.plugin.cluster;
@@ -62,7 +57,7 @@ export default class {
    * use cache in master
    */
   useCache(){
-    if(this.config.common.cache === false){
+    if(this.stc.config.common.cache === false){
       return false;
     }
     let cache = this.plugin.cache;
@@ -88,19 +83,27 @@ export default class {
     });
   }
   /**
+   * get cache type
+   */
+  getCacheType(){
+    let product = this.stc.config.common.product || 'default';
+    return product + '/' + this.plugin.name;
+  }
+  /**
    * invoke in master
    */
   async invokeInMaster(){
     let useCache = this.useCache();
+    let cacheKey = '';
     if(useCache){
       if(!this.cache){
-        this.cache = new StcCache({
-          type: (this.config.common.product || 'default') + '/' + this.plugin.name
+        this.cache = new this.stc.cache({
+          type: this.getCacheType()
         });
       }
       let content = await this.pluginInstance.getContent('utf8');
-      this.cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
-      let value = await this.cache.get(this.cacheKey);
+      cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
+      let value = await this.cache.get(cacheKey);
       if(value){
         return value;
       }
@@ -108,9 +111,9 @@ export default class {
     let useCluster = this.useCluster();
     let ret;
     if(useCluster){
-      ret = await this.cluster.doTask({
-        type: this.extConf.type,
-        pluginIndex: this.extConf.pluginIndex,
+      ret = await this.stc.cluster.doTask({
+        type: this.ext.type,
+        pluginIndex: this.ext.pluginIndex,
         file: this.file.path
       });
     }else{
@@ -118,7 +121,7 @@ export default class {
     }
     //set cache
     if(useCache && ret){
-      await this.cache.set(this.cacheKey, ret);
+      await this.cache.set(cacheKey, ret);
     }
     return ret;
   }
@@ -128,7 +131,7 @@ export default class {
   async run(){
     let ret;
     let startTime = Date.now();
-    if(isMaster && !this.extConf.forceInMaster){
+    if(isMaster){
       ret = await this.invokeInMaster();
       ret = await this.pluginInstance.update(ret);
     }else{
@@ -142,11 +145,9 @@ export default class {
    * run all files
    */
   static async runAll(plugin, files, opts = {
-    config: {},
     options: {},
-    cluster: null,
-    fileManage: null,
-    extConf: {}
+    stc: null,
+    ext: {}
   }){
     let pluginInstance;
     let promises = files.map(file => {
