@@ -44,7 +44,7 @@ export default class {
     if(!isMaster){
       return false;
     }
-    if(this.stc.config.common.cluster === false){
+    if(this.stc.config.cluster === false){
       return false;
     }
     let cluster = this.plugin.cluster;
@@ -57,7 +57,7 @@ export default class {
    * use cache in master
    */
   useCache(){
-    if(this.stc.config.common.cache === false){
+    if(this.stc.config.cache === false){
       return false;
     }
     let cache = this.plugin.cache;
@@ -86,7 +86,7 @@ export default class {
    * get cache type
    */
   getCacheType(){
-    let product = this.stc.config.common.product || 'default';
+    let product = this.stc.config.product || 'default';
     return product + '/' + this.plugin.name;
   }
   /**
