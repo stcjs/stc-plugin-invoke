@@ -149,17 +149,14 @@ export default class {
     stc: null,
     ext: {}
   }){
-    let pluginInstance;
+    plugin = getPluginClass(plugin);
     let promises = files.map(file => {
       let instance = new this(plugin, file, opts);
-      if(!pluginInstance){
-        pluginInstance = instance.pluginInstance;
-      }
       return instance.run();
     });
     await Promise.all(promises);
-    if(isFunction(pluginInstance.after)){
-      return pluginInstance.after(files);
+    if(isFunction(plugin.after)){
+      return plugin.after(files);
     }
   }
   /**
