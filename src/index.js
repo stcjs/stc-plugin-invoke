@@ -150,13 +150,17 @@ export default class {
     ext: {}
   }){
     plugin = getPluginClass(plugin);
+    let pluginInstance;
     let promises = files.map(file => {
       let instance = new this(plugin, file, opts);
+      if(!pluginInstance){
+        pluginInstance = instance;
+      }
       return instance.run();
     });
     await Promise.all(promises);
     if(isFunction(plugin.after)){
-      return plugin.after(files);
+      return plugin.after(files, pluginInstance);
     }
   }
   /**
