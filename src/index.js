@@ -76,6 +76,12 @@ export default class {
    * invoke plugin run method
    */
   invokePluginRun(){
+    let pluginStr = md5(this.plugin.toString());
+    let prop = 'promiseKey';
+    if(this.file.prop(prop) === pluginStr){
+      return this.file.promise;
+    }
+    this.file.prop(prop, pluginStr);
     return this.file.promise.then(() => {
       let promise = Promise.resolve(this.pluginInstance.run());
       this.file.promise = promise;
