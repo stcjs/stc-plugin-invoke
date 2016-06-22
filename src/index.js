@@ -117,7 +117,7 @@ export default class {
     let useCluster = this.useCluster();
     let ret;
     if(useCluster){
-      ret = await this.stc.cluster.doTask({
+      ret = await this.stc.cluster.masterInvoke({
         type: this.ext.type,
         pluginIndex: this.ext.pluginIndex,
         file: this.file.path
