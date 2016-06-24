@@ -75,18 +75,32 @@ export default class {
   /**
    * invoke plugin run method
    */
-  invokePluginRun(){
-    let pluginStr = md5(this.plugin.toString());
-    let prop = 'promiseKey';
-    if(this.file.prop(prop) === pluginStr){
-      return this.file.promise;
+  async invokePluginRun(){
+    let key = this.pluginInstance.getMd5();
+    if(isMaster){
+      return this.file.run(key, () => {
+        return this.pluginInstance.run();
+      })
     }
-    this.file.prop(prop, pluginStr);
-    return this.file.promise.then(() => {
-      let promise = Promise.resolve(this.pluginInstance.run());
-      this.file.promise = promise;
-      return promise;
+    let value = await this.stc.cluster.workerInvoke({
+      method: 'getFilePromise',
+      key,
+      deferred: true,
+      file: this.file.path
     });
+    if(value){
+      return value;
+    }
+    let ret = await this.file.run(key, () => {
+      return this.pluginInstance.run();
+    });
+    await this.stc.cluster.workerInvoke({
+      method: 'resolveFilePromise',
+      file: this.file.path,
+      key,
+      value: ret
+    });
+    return ret;
   }
   /**
    * get cache type
