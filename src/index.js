@@ -153,7 +153,7 @@ export default class {
     let startTime = Date.now();
     if(isMaster){
       ret = await this.invokeInMaster();
-      ret = await this.pluginInstance.update(ret);
+      await this.pluginInstance.update(ret);
     }else{
       ret = await this.invokePluginRun();
     }
