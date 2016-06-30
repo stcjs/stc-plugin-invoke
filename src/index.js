@@ -151,14 +151,12 @@ export default class PluginInvoke {
    * run
    */
   async run(){
-    let ret;
-    let startTime = Date.now();
-    if(isMaster){
-      ret = await this.invokeInMaster();
-      await this.pluginInstance.update(ret);
-    }else{
-      ret = await this.invokePluginRun();
+    if(!isMaster){
+      return this.invokePluginRun();
     }
+    let startTime = Date.now();
+    let ret = await this.invokeInMaster();
+    await this.pluginInstance.update(ret);
     let endTime = Date.now();
     this.logger(`${this.plugin.name}: file=${this.file.path}, time=${endTime - startTime}ms`);
     return ret;
