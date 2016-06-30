@@ -18,7 +18,7 @@ const noop = () => {};
 /**
  * invoke plugin
  */
-export default class {
+export default class PluginInvoke {
   /**
    * constructor
    */
@@ -88,7 +88,7 @@ export default class {
       deferred: true,
       file: this.file.path
     });
-    if(value){
+    if(value !== undefined){
       return value;
     }
     let ret = await this.file.run(key, () => {
@@ -130,7 +130,9 @@ export default class {
     }
     let useCluster = this.useCluster();
     let ret;
-    if(useCluster){
+    // invoke other plugin, has no type & pluginIndex
+    // can not use cluster in this case
+    if(this.ext.type && useCluster){
       ret = await this.stc.cluster.masterInvoke({
         type: this.ext.type,
         pluginIndex: this.ext.pluginIndex,
@@ -140,7 +142,7 @@ export default class {
       ret = await this.invokePluginRun();
     }
     //set cache
-    if(useCache && ret){
+    if(useCache && ret !== undefined){
       await this.cache.set(cacheKey, ret);
     }
     return ret;
