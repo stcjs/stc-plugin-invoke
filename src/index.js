@@ -80,7 +80,7 @@ export default class PluginInvoke {
     if(isMaster){
       return this.file.run(key, () => {
         return this.pluginInstance.run();
-      })
+      }, false);
     }
     let value = await this.stc.cluster.workerInvoke({
       method: 'getFilePromise',
