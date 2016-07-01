@@ -93,7 +93,7 @@ export default class PluginInvoke {
     }
     let ret = await this.file.run(key, () => {
       return this.pluginInstance.run();
-    });
+    }, false);
     await this.stc.cluster.workerInvoke({
       method: 'resolveFilePromise',
       file: this.file.path,
