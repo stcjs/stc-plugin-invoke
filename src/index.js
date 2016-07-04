@@ -125,6 +125,8 @@ export default class PluginInvoke {
       cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
       let value = await this.cache.get(cacheKey);
       if(value){
+        let debug = this.stc.debug('cache');
+        debug(`get ${this.plugin.name} result from cache, file=${this.file.path}`);
         return value;
       }
     }
