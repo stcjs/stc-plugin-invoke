@@ -157,11 +157,11 @@ export default class PluginInvoke {
       return this.invokePluginRun();
     }
     let startTime = Date.now();
-    let ret = await this.invokeInMaster();
-    await this.pluginInstance.update(ret);
+    let runData = await this.invokeInMaster();
+    let updateData = await this.pluginInstance.update(runData);
     let endTime = Date.now();
     this.logger(`${this.plugin.name}: file=${this.file.path}, time=${endTime - startTime}ms`);
-    return ret;
+    return updateData !== undefined ? updateData : runData;
   }
   /**
    * run all files
