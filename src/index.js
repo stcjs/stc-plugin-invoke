@@ -126,7 +126,7 @@ export default class PluginInvoke {
       let value = await this.cache.get(cacheKey);
       if(value){
         let debug = this.stc.debug('cache');
-        debug(`get ${this.plugin.name} result from cache, file=${this.file.path}`);
+        debug(`${this.plugin.name}: get result from cache, file=${this.file.path}`);
         return value;
       }
     }
