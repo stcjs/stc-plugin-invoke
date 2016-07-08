@@ -121,7 +121,7 @@ export default class PluginInvoke {
           type: this.getCacheType()
         });
       }
-      let content = await this.pluginInstance.getContent('utf8');
+      let content = await this.pluginInstance.getContent('binary');
       cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
       let value = await this.cache.get(cacheKey);
       if(value){
