@@ -158,6 +158,7 @@ export default class PluginInvoke {
     }
     let startTime = Date.now();
     let runData = await this.invokeInMaster();
+    this.pluginInstance.prop('__isRun__', true);
     let updateData = await this.pluginInstance.update(runData);
     let endTime = Date.now();
     this.logger(`${this.plugin.name}: file=${this.file.path}, time=${endTime - startTime}ms`);
