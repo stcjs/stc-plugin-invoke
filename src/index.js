@@ -158,6 +158,7 @@ export default class PluginInvoke {
     }
     let startTime = Date.now();
     let runData = await this.invokeInMaster();
+    // set __isRun__ property that allow some method invoke in update
     this.pluginInstance.prop('__isRun__', true);
     let updateData = await this.pluginInstance.update(runData);
     let endTime = Date.now();
