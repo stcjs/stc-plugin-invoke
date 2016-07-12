@@ -30,7 +30,8 @@ export default class PluginInvoke {
   }){
     this.file = file;
     this.stc = opts.stc;
-    this.options = opts.options; //plugin options
+    this.opts = opts;
+    //this.options = opts.options; //plugin options
     this.ext = opts.ext || {};
     this.plugin = getPluginClass(plugin);
     this.pluginInstance = new this.plugin(this.file, opts);
@@ -47,6 +48,9 @@ export default class PluginInvoke {
     if(this.stc.config.cluster === false){
       return false;
     }
+    if(this.opts.cluster === false){
+      return false;
+    }
     let cluster = this.plugin.cluster;
     if(isFunction(cluster)){
       return cluster();
@@ -58,6 +62,9 @@ export default class PluginInvoke {
    */
   useCache(){
     if(this.stc.config.cache === false){
+      return false;
+    }
+    if(this.opts.options === false){
       return false;
     }
     let cache = this.plugin.cache;
@@ -122,7 +129,7 @@ export default class PluginInvoke {
         });
       }
       let content = await this.pluginInstance.getContent().toString('binary');
-      cacheKey = md5(this.plugin.toString() + JSON.stringify(this.options) + content);
+      cacheKey = md5(this.plugin.toString() + JSON.stringify(this.opts.options) + content);
       let value = await this.cache.get(cacheKey);
       if(value){
         let debug = this.stc.debug('cache');
@@ -168,7 +175,7 @@ export default class PluginInvoke {
   /**
    * run all files
    */
-  static async runAll(plugin, files, opts = {
+  static async run(plugin, files, opts = {
     options: {},
     stc: null,
     ext: {}
