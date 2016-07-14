@@ -127,7 +127,8 @@ export default class PluginInvoke {
           type: this.getCacheType()
         });
       }
-      let content = await this.pluginInstance.getContent().toString('binary');
+      let buffer = await this.pluginInstance.getContent();
+      let content = buffer.toString('binary');
       cacheKey = md5(this.pluginInstance.getMd5() + content);
       let value = await this.cache.get(cacheKey);
       if(value){
@@ -158,18 +159,21 @@ export default class PluginInvoke {
   /**
    * run
    */
-  async run(){
+  async run(onlyRun = false){
     if(!isMaster){
       return this.invokePluginRun();
     }
+    if(onlyRun){
+      return this.invokeInMaster();
+    }
     let startTime = Date.now();
-    let runData = await this.invokeInMaster();
-    // set __isRun__ property that allow some method invoke in update
+    let data = await this.invokeInMaster();
+    // set __isRun__ property that allow some methods invoke in update
     this.pluginInstance.prop('__isRun__', true);
-    let updateData = await this.pluginInstance.update(runData);
+    await this.pluginInstance.update(data);
     let endTime = Date.now();
     this.logger(`${this.plugin.name}: file=${this.file.path}, time=${endTime - startTime}ms`);
-    return updateData !== undefined ? updateData : runData;
+    return data;
   }
   /**
    * run all files
