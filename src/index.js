@@ -159,12 +159,9 @@ export default class PluginInvoke {
   /**
    * run
    */
-  async run(onlyRun = false){
+  async run(){
     if(!isMaster){
       return this.invokePluginRun();
-    }
-    if(onlyRun){
-      return this.invokeInMaster();
     }
     let startTime = Date.now();
     let data = await this.invokeInMaster();
