@@ -184,7 +184,7 @@ export default class PluginInvoke {
     let pluginInstance;
     let promises = files.map(file => {
       let instance = new this(plugin, file, opts);
-      pluginInstance = pluginInstance || instance;
+      pluginInstance = pluginInstance || instance.pluginInstance;
       return instance.run();
     });
     await Promise.all(promises);
