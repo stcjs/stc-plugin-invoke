@@ -73,6 +73,16 @@ export default class PluginInvoke {
     return cache;
   }
   /**
+   * use once
+   */
+  useOnce(){
+    let once = this.plugin.once;
+    if(isFunction(once)){
+      return once();
+    }
+    return true;
+  }
+  /**
    * invoke plugin method
    */
   invokePluginMethod(method, args){
@@ -83,10 +93,11 @@ export default class PluginInvoke {
    */
   async invokePluginRun(){
     let key = this.pluginInstance.getMd5();
+    let once = this.useOnce();
     if(isMaster){
       return this.file.run(key, () => {
         return this.pluginInstance.run();
-      }, true);
+      }, once);
     }
     let value = await this.stc.cluster.workerInvoke({
       method: 'getFilePromise',
@@ -99,7 +110,7 @@ export default class PluginInvoke {
     }
     let ret = await this.file.run(key, () => {
       return this.pluginInstance.run();
-    }, true);
+    }, once);
     await this.stc.cluster.workerInvoke({
       method: 'resolveFilePromise',
       file: this.file.path,
