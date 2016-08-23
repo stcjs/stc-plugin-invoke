@@ -63,7 +63,7 @@ export default class PluginInvoke {
     if(this.stc.config.cache === false){
       return false;
     }
-    if(this.opts.options === false){
+    if(this.opts.cache === false){
       return false;
     }
     let cache = this.plugin.cache;
