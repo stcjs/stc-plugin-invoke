@@ -140,7 +140,7 @@ export default class PluginInvoke {
       }
       let buffer = await this.pluginInstance.getContent();
       let content = buffer.toString('binary');
-      cacheKey = md5(this.pluginInstance.getMd5() + content);
+      cacheKey = md5(this.stc.config._tplCacheKey + this.pluginInstance.getMd5() + content);
       let value = await this.cache.get(cacheKey);
       if(value){
         let debug = this.stc.debug('cache');
