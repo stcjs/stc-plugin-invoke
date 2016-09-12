@@ -135,6 +135,7 @@ export default class PluginInvoke {
     if(useCache){
       if(!this.cache){
         this.cache = new this.stc.cache({
+          path: this.stc.config.cachePath,
           type: this.getCacheType()
         });
       }
